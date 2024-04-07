@@ -28,7 +28,5 @@ jobs:
           ## the following creates an ARN based on the values entered into github secrets
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_DEPLOY_ROLE }}
           role-session-name: myGitHubActions
-      - name: build and deploy
-        run: |
-        mvn -B package --file pom.xml
-        aws lambda update-function-code --function-name MCIO-news-summary-site-crawl --zip-file fileb://./target/site-crawler-1.0-SNAPSHOT.jar
+      - name: deploy
+        run: aws lambda update-function-code --function-name MCIO-news-summary-site-crawl --zip-file fileb://./target/site-crawler-1.0-SNAPSHOT.jar
