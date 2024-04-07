@@ -1,5 +1,8 @@
 # Compiled class file
 *.class
+#maven build folder
+/target
+/.idea
 
 # Log file
 *.log
