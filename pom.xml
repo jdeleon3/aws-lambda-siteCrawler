@@ -99,6 +99,20 @@
   <build>
     <pluginManagement>
       <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.6.1</version>
+      <configuration>
+        <annotationProcessorPaths>
+          <path>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger-compiler</artifactId>
+            <version>2.16</version>
+          </path>
+        </annotationProcessorPaths>
+      </configuration>
+    </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
