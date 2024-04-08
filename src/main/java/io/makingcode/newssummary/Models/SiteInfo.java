@@ -7,6 +7,7 @@ public class SiteInfo {
     private String[] embeddedUrls;
     private String[] keywords;
     private String summary;
+    private String siteContent;
     private Boolean isProcessed;
 
     public SiteInfo(String url) {
@@ -23,6 +24,7 @@ public class SiteInfo {
                 ", embeddedUrls=" + Arrays.toString(embeddedUrls) +
                 ", keywords=" + Arrays.toString(keywords) +
                 ", summary='" + summary + '\'' +
+                ", siteContent='" + siteContent + '\'' +
                 ", isProcessed=" + isProcessed +
                 '}';
     }
@@ -65,5 +67,13 @@ public class SiteInfo {
 
     public void setProcessed(Boolean processed) {
         isProcessed = processed;
+    }
+
+    public String getSiteContent() {
+        return siteContent;
+    }
+
+    public void setSiteContent(String siteContent) {
+        this.siteContent = siteContent;
     }
 }
