@@ -1,14 +1,25 @@
 package io.makingcode.newssummary.Services;
 
 import io.makingcode.newssummary.Models.SiteInfo;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
-public class WebSiteContentReader implements ISiteContentReader {
-    @Override
+import javax.inject.Inject;
+import java.io.IOException;
+
+public class WebSiteContentReader {
+
+    @Inject
+    public WebSiteContentReader() {
+    }
+
     public String getSiteContent(String url) {
-        return """
-                <html>
-                    <head></head>
-		            <body><p>This is a test</p></body>
-                </html>""";
+
+        try {
+            Document d = Jsoup.connect(url).get();
+            return d.outerHtml();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
