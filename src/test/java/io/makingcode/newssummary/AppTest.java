@@ -1,9 +1,11 @@
 package io.makingcode.newssummary;
 
 
+import com.rometools.rome.io.FeedException;
 import io.makingcode.newssummary.Components.WebSiteCrawler;
 import io.makingcode.newssummary.Models.SiteInfo;
 import io.makingcode.newssummary.Modules.WebModule;
+import io.makingcode.newssummary.Services.RSSContentReader;
 import io.makingcode.newssummary.Services.WebSiteContentReader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppTest 
 {
     @Mock
-    WebSiteContentReader reader;
+    WebSiteContentReader reader
+            ;
+    @Mock
+    RSSContentReader rssReader;
 
     @Mock
     WebModule web;
@@ -34,12 +41,17 @@ public class AppTest
      * Rigorous Test :-)
      */
     @Test
-    public void testThatProcessRequestIsNotNull(){
+    public void testThatProcessRequestIsNotNull() throws FeedException, IOException {
         //Arrange
-        String url = "https://wowhead.com";
+        String url = "https://fakewowhead.com";
+        String rssUrl = "https://fakewowhead.com/feed/";
         Mockito.when(crawler.buildWeb()).thenReturn(web);
         Mockito.when(web.createWebSiteContentReader()).thenReturn(reader);
+        Mockito.when(web.createRSSContentReader()).thenReturn(rssReader);
         Mockito.when(reader.getSiteContent(url)).thenReturn(TestData.webContent);
+        Mockito.when(reader.findRSSFeedUrls(TestData.webContent)).thenCallRealMethod();
+        Mockito.when(rssReader.processRSSFeed(rssUrl)).thenCallRealMethod();
+        Mockito.when(rssReader.getFeed(rssUrl)).thenReturn(TestData.getRSSFeed());
 
         //Act
         SiteInfo info = h.ProcessRequest(url);
@@ -49,13 +61,17 @@ public class AppTest
     }
 
     @Test
-    public void testThatProcessRequestInfoUrlIsNotEmpty()
-    {
+    public void testThatProcessRequestInfoUrlIsNotEmpty() throws FeedException, IOException {
         //Arrange
-        String url = "https://wowhead.com";
+        String url = "https://fakewowhead.com";
+        String rssUrl = "https://fakewowhead.com/feed/";
         Mockito.when(crawler.buildWeb()).thenReturn(web);
         Mockito.when(web.createWebSiteContentReader()).thenReturn(reader);
+        Mockito.when(web.createRSSContentReader()).thenReturn(rssReader);
         Mockito.when(reader.getSiteContent(url)).thenReturn(TestData.webContent);
+        Mockito.when(reader.findRSSFeedUrls(TestData.webContent)).thenCallRealMethod();
+        Mockito.when(rssReader.processRSSFeed(rssUrl)).thenCallRealMethod();
+        Mockito.when(rssReader.getFeed(rssUrl)).thenReturn(TestData.getRSSFeed());
 
         //Act
         SiteInfo info = h.ProcessRequest(url);
@@ -65,18 +81,42 @@ public class AppTest
     }
 
     @Test
-    public void testThatProcessRequestInfoSiteContentIsNotEmpty()
-    {
+    public void testThatProcessRequestInfoSiteContentIsNotEmpty() throws FeedException, IOException {
         //Arrange
-        String url = "https://wowhead.com";
+        String url = "https://fakewowhead.com";
+        String rssUrl = "https://fakewowhead.com/feed/";
         Mockito.when(crawler.buildWeb()).thenReturn(web);
         Mockito.when(web.createWebSiteContentReader()).thenReturn(reader);
+        Mockito.when(web.createRSSContentReader()).thenReturn(rssReader);
         Mockito.when(reader.getSiteContent(url)).thenReturn(TestData.webContent);
+        Mockito.when(reader.findRSSFeedUrls(TestData.webContent)).thenCallRealMethod();
+        Mockito.when(rssReader.processRSSFeed(rssUrl)).thenCallRealMethod();
+        Mockito.when(rssReader.getFeed(rssUrl)).thenReturn(TestData.getRSSFeed());
 
         //Act
         SiteInfo info = h.ProcessRequest(url);
 
         //Assert
         assertFalse(info.getSiteContent().isEmpty());
+    }
+
+    @Test
+    public void testThatRSSFeederReturns2Urls() throws FeedException, IOException {
+        //Arrange
+        String url = "https://fakewowhead.com";
+        String rssUrl = "https://fakewowhead.com/feed/";
+        Mockito.when(crawler.buildWeb()).thenReturn(web);
+        Mockito.when(web.createWebSiteContentReader()).thenReturn(reader);
+        Mockito.when(web.createRSSContentReader()).thenReturn(rssReader);
+        Mockito.when(reader.getSiteContent(url)).thenReturn(TestData.webContent);
+        Mockito.when(reader.findRSSFeedUrls(TestData.webContent)).thenCallRealMethod();
+        Mockito.when(rssReader.processRSSFeed(rssUrl)).thenCallRealMethod();
+        Mockito.when(rssReader.getFeed(rssUrl)).thenReturn(TestData.getRSSFeed());
+
+        //Act
+        SiteInfo info = h.ProcessRequest(url);
+
+        //Assert
+        assertEquals(2, info.getEmbeddedUrls().size());
     }
 }

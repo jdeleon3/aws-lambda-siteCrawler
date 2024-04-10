@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import com.google.gson.Gson;
+import com.rometools.rome.io.FeedException;
 import io.makingcode.newssummary.Components.DaggerWebSiteCrawler;
 import io.makingcode.newssummary.Components.WebSiteCrawler;
 import io.makingcode.newssummary.Models.CrawlRequest;
@@ -13,7 +14,9 @@ import io.makingcode.newssummary.Modules.WebModule;
 import org.apache.logging.log4j.core.util.JsonUtils;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class Handler implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
 
@@ -38,18 +41,23 @@ public class Handler implements RequestHandler<APIGatewayV2HTTPEvent, APIGateway
         }
         catch (Exception e){
             response.setStatusCode(500);
-            response.setBody(g.toJson(e.getMessage()));
+            response.setBody("{\"error\": \"" + e.getMessage() + "\"}");
         }
         response.setHeaders(responseHeaders);
         return response;
     }
 
-    public SiteInfo ProcessRequest(String url) {
+    public SiteInfo ProcessRequest(String url) throws FeedException, IOException {
 
         SiteInfo info = new SiteInfo();
         WebModule web = crawler.buildWeb();//.createWebSiteContentReader().getSiteContent(url)
         info.setUrl(url);
         info.setSiteContent(web.createWebSiteContentReader().getSiteContent(url));
+        String rssUrl = web.createWebSiteContentReader().findRSSFeedUrls(info.getSiteContent());
+        if(!rssUrl.isEmpty()){
+            List<String> links = web.createRSSContentReader().processRSSFeed(rssUrl);
+            info.setEmbeddedUrls(links);
+        }
         return info;
     }
 }
