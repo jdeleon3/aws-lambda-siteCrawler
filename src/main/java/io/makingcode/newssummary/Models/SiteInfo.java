@@ -1,11 +1,12 @@
 package io.makingcode.newssummary.Models;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class SiteInfo {
     private String url;
-    private String[] embeddedUrls;
-    private String[] keywords;
+    private List<String> embeddedUrls;
+    private List<String> keywords;
     private String summary;
     private String siteContent;
     private Boolean isProcessed;
@@ -21,12 +22,28 @@ public class SiteInfo {
     public String toString() {
         return "SiteInfo{" +
                 "url='" + url + '\'' +
-                ", embeddedUrls=" + Arrays.toString(embeddedUrls) +
-                ", keywords=" + Arrays.toString(keywords) +
+                ", embeddedUrls=" + embeddedUrls +
+                ", keywords=" + keywords +
                 ", summary='" + summary + '\'' +
                 ", siteContent='" + siteContent + '\'' +
                 ", isProcessed=" + isProcessed +
                 '}';
+    }
+
+    public List<String> getEmbeddedUrls() {
+        return embeddedUrls;
+    }
+
+    public void setEmbeddedUrls(List<String> embeddedUrls) {
+        this.embeddedUrls = embeddedUrls;
+    }
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
     }
 
     public String getUrl() {
@@ -35,22 +52,6 @@ public class SiteInfo {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String[] getEmbeddedUrls() {
-        return embeddedUrls;
-    }
-
-    public void setEmbeddedUrls(String[] embeddedUrls) {
-        this.embeddedUrls = embeddedUrls;
-    }
-
-    public String[] getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(String[] keywords) {
-        this.keywords = keywords;
     }
 
     public String getSummary() {
