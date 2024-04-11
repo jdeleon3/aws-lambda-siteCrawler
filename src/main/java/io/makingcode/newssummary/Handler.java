@@ -15,6 +15,8 @@ import org.apache.logging.log4j.core.util.JsonUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class Handler implements RequestHandler<APIGatewayV2HTTPEvent, APIGateway
     public Handler(){
         this.crawler = DaggerWebSiteCrawler.create();
     }
+
     //public WebSiteCrawler crawler;
     @Override
     public APIGatewayV2HTTPResponse handleRequest(APIGatewayV2HTTPEvent event, Context context) {
@@ -47,14 +50,24 @@ public class Handler implements RequestHandler<APIGatewayV2HTTPEvent, APIGateway
         return response;
     }
 
-    public SiteInfo ProcessRequest(String url) throws FeedException, IOException {
-
+    public SiteInfo ProcessRequest(String url) throws FeedException, IOException, URISyntaxException {
+        URI uri = URI.create(url);
         SiteInfo info = new SiteInfo();
         WebModule web = crawler.buildWeb();//.createWebSiteContentReader().getSiteContent(url)
         info.setUrl(url);
-        info.setSiteContent(web.createWebSiteContentReader().getSiteContent(url));
-        String rssUrl = web.createWebSiteContentReader().findRSSFeedUrls(info.getSiteContent());
-        if(!rssUrl.isEmpty()){
+        info.setSiteContent(web.createWebSiteContentReader().getSiteContent(uri.toString()));
+        String rssUrl;
+        if(uri.getHost().contains("reddit.com")){
+            rssUrl = uri.toString() + ".rss";
+        }
+        else{
+            rssUrl = web.createWebSiteContentReader().findRSSFeedUrls(info.getSiteContent());
+        }
+
+        if(rssUrl != null && !rssUrl.isBlank()){
+            if(!rssUrl.contains("http")){
+                rssUrl = new URI(uri.getScheme(),uri.getHost(),rssUrl,null).toString();
+            }
             List<String> links = web.createRSSContentReader().processRSSFeed(rssUrl);
             info.setEmbeddedUrls(links);
         }
